@@ -62,6 +62,10 @@ func Expect(t TB, v interface{}) *structAssert {
 	return check.assertStruct()
 }
 
+func (a *structAssert) Expect(v interface{}) *structAssert {
+	return Expect(a.t, v)
+}
+
 func (a *structAssert) assertStruct() *structAssert {
 	value := reflect.ValueOf(a.value)
 
@@ -133,3 +137,5 @@ func (a *structAssert) ExpectField(name string) *field {
 	}
 	return structField
 }
+
+//TODO: check Tag
