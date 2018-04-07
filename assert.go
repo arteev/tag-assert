@@ -15,6 +15,7 @@ var (
 	ErrUnxpectedNil  = errors.New("Unexpected nil")
 	ErrFieldNotFound = errors.New("Field not found")
 	ErrUnexported    = errors.New("Field unexported")
+	ErrTagNotFound   = errors.New("Tag not found")
 )
 
 type TB interface {
@@ -139,3 +140,17 @@ func (a *structAssert) ExpectField(name string) *field {
 }
 
 //TODO: check Tag
+
+func (f *field) HasTag(name string) *field {
+
+	if f.structField == nil {
+		f.Assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+		return f
+	}
+	_, ok := f.structField.Tag.Lookup(name)
+	if !ok {
+		f.Assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+	}
+
+	return f
+}

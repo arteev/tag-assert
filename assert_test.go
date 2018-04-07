@@ -33,8 +33,9 @@ type SubStruct struct {
 	Name string
 }
 type TestStruct struct {
-	private string
-	Public  string
+	private     string
+	Public      string `tag1:"pub" tag2:"public,options"`
+	WithoutTags string
 	SubStruct
 }
 
@@ -172,6 +173,34 @@ func TestHasField(t *testing.T) {
 
 }
 
+func TestHasTag(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+
+	test.mockT.EXPECT().Helper().AnyTimes()
+
+	assert := Expect(test.t, TestStruct{})
+
+	test.mockT.EXPECT().Error(gomock.Any()).Do(func(args ...interface{}) {
+		if goerror.Cause(args[0].(error)) != ErrUnexported {
+			t.Errorf("Expected %v, got %v", ErrUnexported, args[0])
+		}
+	})
+
+	test.mockT.EXPECT().Error(gomock.Any()).Times(3).Do(func(args ...interface{}) {
+		if goerror.Cause(args[0].(error)) != ErrTagNotFound {
+			t.Errorf("Expected %v, got %v", ErrTagNotFound, args[0])
+		}
+	})
+	assert.ExpectField("private").HasTag("Unknown")
+	assert.ExpectField("WithoutTags").HasTag("Unknown")
+	assert.ExpectField("Public").HasTag("Unknown")
+
+	//check for absence of call Error
+	assert.ExpectField("Public").HasTag("tag1").HasTag("tag2")
+
+}
+
 func TestExpectField(t *testing.T) {
 	test := setUp(t)
 	defer test.tearDown()
@@ -214,5 +243,4 @@ func TestExpectField(t *testing.T) {
 	if field.structField != nil {
 		t.Errorf("Expected field.structField nil,got %v", field.structField)
 	}
-
 }
