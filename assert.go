@@ -47,9 +47,15 @@ type structAssert struct {
 }
 
 type field struct {
-	Assert      *structAssert
+	assert      *structAssert
 	name        string
 	structField *reflect.StructField
+}
+
+type tag struct {
+	Field *field
+	Name  string
+	Value string
 }
 
 func Expect(t TB, v interface{}) *structAssert {
@@ -114,7 +120,7 @@ func (a *structAssert) mustStructField(name string) (*field, bool) {
 	a.fields[name] = &field{
 		name:        name,
 		structField: &structField,
-		Assert:      a,
+		assert:      a,
 	}
 	return a.fields[name], true
 
@@ -134,7 +140,7 @@ func (a *structAssert) ExpectField(name string) *field {
 	structField = &field{
 		name:        name,
 		structField: nil,
-		Assert:      a,
+		assert:      a,
 	}
 	return structField
 }
@@ -142,15 +148,49 @@ func (a *structAssert) ExpectField(name string) *field {
 //TODO: check Tag
 
 func (f *field) HasTag(name string) *field {
-
 	if f.structField == nil {
-		f.Assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
 		return f
 	}
 	_, ok := f.structField.Tag.Lookup(name)
 	if !ok {
-		f.Assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+	}
+	return f
+}
+
+func (f *field) ExpectTag(name string) *tag {
+	if f.structField == nil {
+		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+		return &tag{Name: name}
 	}
 
+	value, ok := f.structField.Tag.Lookup(name)
+	if !ok {
+		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+	}
+	return &tag{
+		Field: f,
+		Name:  name,
+		Value: value,
+	}
+}
+
+func (t *tag) HasValue(value string) bool {
+	if t.Field == nil {
+		return false
+	}
+	return t.Value == value
+}
+
+func (f *field) Assert(name, value string) *field {
+	t := f.ExpectTag(name)
+	if t.Field == nil {
+		return f
+	}
+
+	if !t.HasValue(value) {
+		f.assert.t.Errorf("%s: value is not %s, actual %s", t.Name, value, t.Value)
+	}
 	return f
 }

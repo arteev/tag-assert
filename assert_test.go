@@ -213,7 +213,7 @@ func TestExpectField(t *testing.T) {
 		t.Error("Unexpected nil")
 	}
 
-	if assert != field.Assert {
+	if assert != field.assert {
 		t.Errorf("Expected %p, got %p", assert, field.Assert)
 	}
 	if field.name != "Public" {
