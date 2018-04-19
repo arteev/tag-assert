@@ -92,7 +92,7 @@ func TestAreStructs(t *testing.T) {
 			Value:      nil,
 			MustFailed: true,
 			Expected: func() {
-				test.mockT.EXPECT().Helper()
+				test.mockT.EXPECT().Helper().AnyTimes()
 				test.mockT.EXPECT().Fatal(ErrUnxpectedNil)
 			},
 		},
@@ -101,7 +101,7 @@ func TestAreStructs(t *testing.T) {
 			Value:      0,
 			MustFailed: true,
 			Expected: func() {
-				test.mockT.EXPECT().Helper()
+				test.mockT.EXPECT().Helper().AnyTimes()
 				test.mockT.EXPECT().Fatal(ErrNotStruct)
 			},
 		},
@@ -111,7 +111,7 @@ func TestAreStructs(t *testing.T) {
 			Value:      struct{}{},
 			MustFailed: false,
 			Expected: func() {
-				test.mockT.EXPECT().Helper()
+				test.mockT.EXPECT().Helper().AnyTimes()
 			},
 		},
 
@@ -120,7 +120,7 @@ func TestAreStructs(t *testing.T) {
 			Value:      nilTypeStruct,
 			MustFailed: false,
 			Expected: func() {
-				test.mockT.EXPECT().Helper()
+				test.mockT.EXPECT().Helper().AnyTimes()
 
 			},
 		},
@@ -129,7 +129,7 @@ func TestAreStructs(t *testing.T) {
 			Value:      TypeStruct{},
 			MustFailed: false,
 			Expected: func() {
-				test.mockT.EXPECT().Helper()
+				test.mockT.EXPECT().Helper().AnyTimes()
 
 			},
 		},

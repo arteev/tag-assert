@@ -70,10 +70,12 @@ func Expect(t TB, v interface{}) *structAssert {
 }
 
 func (a *structAssert) Expect(v interface{}) *structAssert {
+	a.t.Helper()
 	return Expect(a.t, v)
 }
 
 func (a *structAssert) assertStruct() *structAssert {
+	a.t.Helper()
 	value := reflect.ValueOf(a.value)
 
 	if value.Kind() == reflect.Invalid {
@@ -96,7 +98,7 @@ func (a *structAssert) assertStruct() *structAssert {
 }
 
 func (a *structAssert) mustStructField(name string) (*field, bool) {
-
+	a.t.Helper()
 	if field, ok := a.fields[name]; ok {
 		return field, true
 	}
@@ -132,6 +134,7 @@ func (a *structAssert) HasField(name string) *structAssert {
 }
 
 func (a *structAssert) ExpectField(name string) *field {
+	a.t.Helper()
 	structField, ok := a.mustStructField(name)
 	if ok {
 		return structField
@@ -160,6 +163,7 @@ func (f *field) HasTag(name string) *field {
 }
 
 func (f *field) ExpectTag(name string) *tag {
+	f.assert.t.Helper()
 	if f.structField == nil {
 		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
 		return &tag{Name: name}
@@ -184,6 +188,7 @@ func (t *tag) HasValue(value string) bool {
 }
 
 func (f *field) Assert(name, value string) *field {
+	f.assert.t.Helper()
 	t := f.ExpectTag(name)
 	if t.Field == nil {
 		return f
