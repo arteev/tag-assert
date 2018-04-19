@@ -1,4 +1,4 @@
-package main
+package example
 
 type ExampleStruct struct {
 	Name string `xml:"Name" json:"name,omitempty"`
