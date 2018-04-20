@@ -3,7 +3,6 @@ package assert
 import (
 	"errors"
 	"reflect"
-	"testing"
 	"unicode"
 
 	goerror "github.com/pkg/errors"
@@ -18,7 +17,7 @@ var (
 	ErrTagNotFound   = errors.New("Tag not found")
 )
 
-type TB interface {
+type tb interface {
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
 	Fail()
@@ -35,46 +34,48 @@ type TB interface {
 	Skipped() bool
 	Helper()
 }
-type internalTest struct {
-	*testing.T
-}
 
-type structAssert struct {
-	t      TB
+//StructAssert contains methods for verifying the structure
+type StructAssert struct {
+	t      tb
 	value  interface{}
 	failed bool
-	fields map[string]*field
+	fields map[string]*Field
 }
 
-type field struct {
-	assert      *structAssert
+//Field contains methods for verifying the field
+type Field struct {
+	assert      *StructAssert
 	name        string
 	structField *reflect.StructField
 }
 
-type tag struct {
-	Field *field
+//Tag of field
+type Tag struct {
+	Field *Field
 	Name  string
 	Value string
 }
 
-func Expect(t TB, v interface{}) *structAssert {
+//Expect waiting for a structure to verify assert
+func Expect(t tb, v interface{}) *StructAssert {
 	t.Helper()
 
-	check := &structAssert{
+	check := &StructAssert{
 		t:      t,
 		value:  v,
-		fields: make(map[string]*field),
+		fields: make(map[string]*Field),
 	}
 	return check.assertStruct()
 }
 
-func (a *structAssert) Expect(v interface{}) *structAssert {
+//Expect waiting for a structure to verify assert
+func (a *StructAssert) Expect(v interface{}) *StructAssert {
 	a.t.Helper()
 	return Expect(a.t, v)
 }
 
-func (a *structAssert) assertStruct() *structAssert {
+func (a *StructAssert) assertStruct() *StructAssert {
 	a.t.Helper()
 	value := reflect.ValueOf(a.value)
 
@@ -97,7 +98,7 @@ func (a *structAssert) assertStruct() *structAssert {
 	return a
 }
 
-func (a *structAssert) mustStructField(name string) (*field, bool) {
+func (a *StructAssert) mustStructField(name string) (*Field, bool) {
 	a.t.Helper()
 	if field, ok := a.fields[name]; ok {
 		return field, true
@@ -119,7 +120,7 @@ func (a *structAssert) mustStructField(name string) (*field, bool) {
 		return nil, false
 	}
 	//ErrUnexported
-	a.fields[name] = &field{
+	a.fields[name] = &Field{
 		name:        name,
 		structField: &structField,
 		assert:      a,
@@ -128,19 +129,21 @@ func (a *structAssert) mustStructField(name string) (*field, bool) {
 
 }
 
-func (a *structAssert) HasField(name string) *structAssert {
+//HasField checks the existence of a field in the structure
+func (a *StructAssert) HasField(name string) *StructAssert {
 	a.mustStructField(name)
 	return a
 }
 
-func (a *structAssert) ExpectField(name string) *field {
+//ExpectField waiting for a field with name to verify assert
+func (a *StructAssert) ExpectField(name string) *Field {
 	a.t.Helper()
 	structField, ok := a.mustStructField(name)
 	if ok {
 		return structField
 	}
 	//TODO: mark not found
-	structField = &field{
+	structField = &Field{
 		name:        name,
 		structField: nil,
 		assert:      a,
@@ -150,7 +153,8 @@ func (a *structAssert) ExpectField(name string) *field {
 
 //TODO: check Tag
 
-func (f *field) HasTag(name string) *field {
+//HasTag checks the existence of a tag in the field
+func (f *Field) HasTag(name string) *Field {
 	if f.structField == nil {
 		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
 		return f
@@ -162,32 +166,35 @@ func (f *field) HasTag(name string) *field {
 	return f
 }
 
-func (f *field) ExpectTag(name string) *tag {
+//ExpectTag waiting for a tag with name to verify assert
+func (f *Field) ExpectTag(name string) *Tag {
 	f.assert.t.Helper()
 	if f.structField == nil {
 		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
-		return &tag{Name: name}
+		return &Tag{Name: name}
 	}
 
 	value, ok := f.structField.Tag.Lookup(name)
 	if !ok {
 		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
 	}
-	return &tag{
+	return &Tag{
 		Field: f,
 		Name:  name,
 		Value: value,
 	}
 }
 
-func (t *tag) HasValue(value string) bool {
+//HasValue checks the tag for the specified value
+func (t *Tag) HasValue(value string) bool {
 	if t.Field == nil {
 		return false
 	}
 	return t.Value == value
 }
 
-func (f *field) Assert(name, value string) *field {
+//Assert checks the tag (name) with the specified value
+func (f *Field) Assert(name, value string) *Field {
 	f.assert.t.Helper()
 	t := f.ExpectTag(name)
 	if t.Field == nil {

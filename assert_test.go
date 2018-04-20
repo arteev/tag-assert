@@ -10,7 +10,7 @@ import (
 
 type testAssert struct {
 	mockT      *MockTB
-	t          TB
+	t          tb
 	controller *gomock.Controller
 }
 
@@ -32,6 +32,8 @@ func (t *testAssert) tearDown() {
 type SubStruct struct {
 	Name string
 }
+
+//nolint
 type TestStruct struct {
 	private     string
 	Public      string `tag1:"pub" tag2:"public,options"`
