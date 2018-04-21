@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/arteev/tag-assert/badge.svg?branch=master&service=github)](https://coveralls.io/github/arteev/tag-assert?branch=master)
 [![GoDoc](https://godoc.org/github.com/arteev/tag-assert?status.png)](https://godoc.org/github.com/arteev/go-assert)
 
+
 # tag-assert
 
 Checking tags of Golang structures
