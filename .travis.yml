@@ -11,4 +11,4 @@ before_install:
   - if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
   
 script:
-  - $HOME/gopath/bin/goveralls -coverprofile= -v -repotoken $APIKEY
+  - $HOME/gopath/bin/goveralls -ignore mocktesting.go -coverprofile= -v -repotoken $APIKEY
