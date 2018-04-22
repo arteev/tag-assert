@@ -155,6 +155,7 @@ func (a *StructAssert) ExpectField(name string) *Field {
 
 //HasTag checks the existence of a tag in the field
 func (f *Field) HasTag(name string) *Field {
+	f.assert.t.Helper()
 	if f.structField == nil {
 		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
 		return f
@@ -177,6 +178,7 @@ func (f *Field) ExpectTag(name string) *Tag {
 	value, ok := f.structField.Tag.Lookup(name)
 	if !ok {
 		f.assert.t.Error(goerror.Wrap(ErrTagNotFound, name))
+		return &Tag{Name: name}
 	}
 	return &Tag{
 		Field: f,

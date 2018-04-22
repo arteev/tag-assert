@@ -172,6 +172,111 @@ func TestHasField(t *testing.T) {
 		HasField("private").
 		HasField("SubStruct").
 		HasField("Unknown")
+}
+
+func TestHasValue(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+
+	test.mockT.EXPECT().Helper().AnyTimes()
+
+	assert := Expect(test.t, TestStruct{})
+
+	has := assert.ExpectField("Public").ExpectTag("tag1").HasValue("12")
+	if has {
+		t.Error("Unexpected has")
+	}
+	has = assert.ExpectField("Public").ExpectTag("tag1").HasValue("pub")
+	if !has {
+		t.Error("Expected has")
+	}
+
+	test.mockT.EXPECT().Error(gomock.Any()).Do(func(args ...interface{}) {
+		if goerror.Cause(args[0].(error)) != ErrTagNotFound {
+			t.Errorf("Expected %v, got %v", ErrTagNotFound, args[0])
+		}
+	})
+
+	has = assert.ExpectField("Public").ExpectTag("Unknown").HasValue("pub")
+	if has {
+		t.Error("Unexpected has")
+	}
+
+}
+
+func TestAssertTag(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+
+	test.mockT.EXPECT().Helper().AnyTimes()
+
+	assert := Expect(test.t, TestStruct{})
+
+	field := assert.ExpectField("Public")
+
+	f := field.Assert("tag1", "pub")
+
+	if f != field {
+		t.Errorf("Expected %p, got %p", field, f)
+	}
+
+	test.mockT.EXPECT().Errorf(gomock.Any(), gomock.Any()).Do(func(format string, args ...interface{}) {
+		/*if goerror.Cause(args[0].(error)) != ErrUnexported {
+			t.Errorf("Expected %v, got %v", ErrUnexported, args[0])
+		}*/
+		wantFormat := "%s: value is not %s, actual %s"
+		if wantFormat != format {
+			t.Errorf("Expected format: %s,got %s", wantFormat, format)
+		}
+		if len(args) != 3 {
+			t.Error("Expected len args = 3")
+		}
+		if args[0] != "tag1" {
+			t.Error("Expected tag1")
+		}
+		if args[1] != "unknown" {
+			t.Error("Expected unknown")
+		}
+		if args[2] != "pub" {
+			t.Error("Expected pub")
+		}
+	})
+	field.Assert("tag1", "unknown")
+
+	test.mockT.EXPECT().Error(gomock.Any()).Do(func(args ...interface{}) {
+		if goerror.Cause(args[0].(error)) != ErrTagNotFound {
+			t.Errorf("Expected %v, got %v", ErrTagNotFound, args[0])
+		}
+	})
+
+	field.Assert("unknown", "unknown")
+}
+func TestExpectTag(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+
+	test.mockT.EXPECT().Helper().AnyTimes()
+
+	test.mockT.EXPECT().Error(gomock.Any()).Do(func(args ...interface{}) {
+		if goerror.Cause(args[0].(error)) != ErrUnexported {
+			t.Errorf("Expected %v, got %v", ErrUnexported, args[0])
+		}
+	})
+
+	test.mockT.EXPECT().Error(gomock.Any()).Times(3).Do(func(args ...interface{}) {
+		if goerror.Cause(args[0].(error)) != ErrTagNotFound {
+			t.Errorf("Expected %v, got %v", ErrTagNotFound, args[0])
+		}
+	})
+
+	assert := Expect(test.t, TestStruct{})
+
+	assert.ExpectField("private").ExpectTag("Unknown")
+	assert.ExpectField("WithoutTags").ExpectTag("Unknown")
+	assert.ExpectField("Public").ExpectTag("Unknown")
+
+	assert.ExpectField("Public").ExpectTag("tag1")
+	assert.ExpectField("Public").ExpectTag("tag2")
 
 }
 

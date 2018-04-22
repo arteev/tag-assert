@@ -9,7 +9,7 @@ mock:
 	mv _mocktesting.go mocktesting.go
 
 lint:
-	gometalinter.v2 --enable-all --exclude mock* ./...
+	gometalinter.v2 --enable-all --exclude mock --exclude *_test.go ./...
 
 example:
 	go test -v ./_example/
