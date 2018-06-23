@@ -17,10 +17,17 @@ func TestExampleStructTagsValueFailed(t *testing.T) {
 	v := ExampleStruct{}
 	assert.Expect(t, v).ExpectField("ID").
 		Assert("xml", "ID").
-		Assert("json", "id") // this error
+		Assert("json", "id"). // this error
+		HasTag("bson").
+		ExpectTag("json").
+		Equal("rn").
+		Equal("id") //this error
 
 	assert.Expect(t, v).ExpectField("SN").
 		Assert("xml", "SN").
 		Assert("json", "social_number")
+
+	assert.Expect(t, v).ExpectField("private").
+		Assert("xml", "private")
 
 }
