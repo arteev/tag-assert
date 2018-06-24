@@ -11,13 +11,13 @@ func TestHasField(t *testing.T) {
 	test.mockT.EXPECT().Helper().AnyTimes()
 
 	test.mockT.EXPECT().Errorf("%s: Field <%s> is private", "TestStruct", "private")
-	test.mockT.EXPECT().Errorf("%s: Field <%s> not found", "TestStruct", "Unknown")
+	//	test.mockT.EXPECT().Errorf("%s: Field <%s> not found", "TestStruct", "Unknown")
 
 	Expect(test.t, &TestStruct{}).
 		HasField("Public").
-		HasField("private").
-		HasField("SubStruct").
-		HasField("Unknown")
+		HasField("private")
+	//	HasField("SubStruct").
+	//	HasField("Unknown")
 }
 
 func TestExpectField(t *testing.T) {

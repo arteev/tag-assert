@@ -30,7 +30,12 @@ func TestTagNotEmpty(t *testing.T) {
 	test.mockT.EXPECT().Helper().AnyTimes()
 	test.mockT.EXPECT().Errorf("%s: Tag <%s> is empty", "<Unnamed>.Test", "json")
 	tag.NotEmpty()
-	assert.ExpectField("TestNotEmpty").ExpectTag("json").NotEmpty()
+
+	tag = assert.ExpectField("TestNotEmpty").ExpectTag("json")
+	tag.NotEmpty()
+
+	test.mockT.EXPECT().Errorf("%s: Field <%s> not found", "Unnamed", "Unknown")
+	assert.ExpectField("Unknown")
 }
 
 func TestTagEqual(t *testing.T) {

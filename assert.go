@@ -92,13 +92,19 @@ func (a *StructAssert) mustStructField(name string) (*Field, bool) {
 	if vtype.Kind() == reflect.Ptr {
 		vtype = vtype.Elem()
 	}
+
+	nameStruct := vtype.Name()
+	if nameStruct == "" {
+		nameStruct = "Unnamed"
+	}
+
 	structField, ok := vtype.FieldByName(name)
 	if !ok {
-		a.t.Errorf("%s: Field <%s> not found", vtype.Name(), name)
+		a.t.Errorf("%s: Field <%s> not found", nameStruct, name)
 		return nil, false
 	}
 	if unicode.IsLower(rune(name[0])) {
-		a.t.Errorf("%s: Field <%s> is private", vtype.Name(), name)
+		a.t.Errorf("%s: Field <%s> is private", nameStruct, name)
 		return nil, false
 	}
 	a.fields[name] = &Field{
