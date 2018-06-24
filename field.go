@@ -67,3 +67,19 @@ func (f *Field) HasTag(name string) *Field {
 	}
 	return f
 }
+
+//HasTags checks the existence of tags in the field
+func (f *Field) HasTags(names ...string) *Field {
+	for _, name := range names {
+		f.HasTag(name)
+	}
+	return f
+}
+
+//Empty verifies that the tag is empty
+func (f *Field) Empty() *Field {
+	if string(f.structField.Tag) != "" {
+		f.assert.t.Errorf("%s: Not empty", f.getFullName())
+	}
+	return f
+}

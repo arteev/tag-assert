@@ -1,9 +1,10 @@
 package example
 
 type ExampleStruct struct {
-	Name    string `xml:"Name" json:"name,omitempty"`
-	ID      int    `xml:"ID" json:"rn"`
-	private string `xml:"private"`
+	Name       string `xml:"Name" json:"name,omitempty"`
+	ID         int    `xml:"ID" json:"rn"`
+	private    string `xml:"private"`
+	WithoutTag string
 }
 
 func main() {

@@ -8,11 +8,8 @@ import (
 
 //Errors
 var (
-	ErrNotStruct     = errors.New("Must be struct")
-	ErrUnxpectedNil  = errors.New("Unexpected nil")
-	ErrFieldNotFound = errors.New("Field not found")
-	ErrUnexported    = errors.New("Field unexported")
-	ErrTagNotFound   = errors.New("Tag not found")
+	ErrNotStruct    = errors.New("Must be struct")
+	ErrUnxpectedNil = errors.New("Unexpected nil")
 )
 
 type tb interface {

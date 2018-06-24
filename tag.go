@@ -25,3 +25,15 @@ func (t *Tag) Equal(value string) *Tag {
 	}
 	return t
 }
+
+//NotEmpty check for empty value
+func (t *Tag) NotEmpty() *Tag {
+	if t.Field == nil {
+		return t
+	}
+	t.Field.assert.t.Helper()
+	if t.Value == "" {
+		t.Field.assert.t.Errorf("%s: Tag <%s> is empty", t.Field.getFullName(), t.Name)
+	}
+	return t
+}

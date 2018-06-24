@@ -18,6 +18,21 @@ func TestTagHasValue(t *testing.T) {
 	}
 }
 
+func TestTagNotEmpty(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+	assert := Expect(t, &struct {
+		Test         string `json:""`
+		TestNotEmpty string `json:"test"`
+	}{})
+	tag := assert.ExpectField("Test").ExpectTag("json")
+	assert.t = test.mockT
+	test.mockT.EXPECT().Helper().AnyTimes()
+	test.mockT.EXPECT().Errorf("%s: Tag <%s> is empty", "<Unnamed>.Test", "json")
+	tag.NotEmpty()
+	assert.ExpectField("TestNotEmpty").ExpectTag("json").NotEmpty()
+}
+
 func TestTagEqual(t *testing.T) {
 	test := setUp(t)
 	defer test.tearDown()
@@ -52,7 +67,17 @@ func TestHasTag(t *testing.T) {
 
 	//check no call Errorf
 	assert.ExpectField("Public").HasTag("tag1").HasTag("tag2")
+}
 
+func TestHasTags(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+
+	test.mockT.EXPECT().Helper().AnyTimes()
+
+	assert := Expect(test.t, TestStruct{})
+	test.mockT.EXPECT().Errorf("%s: Tag <%s> not found", "TestStruct.Public", "unknown")
+	assert.ExpectField("Public").HasTags("tag1", "tag2", "unknown")
 }
 
 func TestAssertTag(t *testing.T) {

@@ -54,3 +54,15 @@ func TestExpectField(t *testing.T) {
 		t.Errorf("Expected field.structField nil,got %v", field.structField)
 	}
 }
+
+func TestTagEmpty(t *testing.T) {
+	test := setUp(t)
+	defer test.tearDown()
+
+	test.mockT.EXPECT().Helper().AnyTimes()
+	test.mockT.EXPECT().Errorf("%s: Not empty", "<Unnamed>.Public")
+	Expect(test.t, &TestStruct{}).
+		ExpectField("Public").Empty()
+
+	Expect(test.t, &TestStruct{}).ExpectField("WithoutTags").Empty()
+}

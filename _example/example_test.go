@@ -11,6 +11,8 @@ func TestExampleStructTagsValueSuccess(t *testing.T) {
 	assert.Expect(t, v).ExpectField("Name").
 		Assert("xml", "Name").
 		Assert("json", "name,omitempty")
+
+	assert.Expect(t, v).ExpectField("WithoutTag").Empty()
 }
 
 func TestExampleStructTagsValueFailed(t *testing.T) {
@@ -19,9 +21,7 @@ func TestExampleStructTagsValueFailed(t *testing.T) {
 		Assert("xml", "ID").
 		Assert("json", "id"). // this error
 		HasTag("bson").
-		ExpectTag("json").
-		Equal("rn").
-		Equal("id") //this error
+		ExpectTag("json").Equal("rn").Equal("id") //this error
 
 	assert.Expect(t, v).ExpectField("SN").
 		Assert("xml", "SN").
