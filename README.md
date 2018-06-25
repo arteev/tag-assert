@@ -14,7 +14,7 @@ Checking tags of Golang structures
 go get github.com/arteev/tag-assert
 ```
 
-## Using
+## Usage
 
 ```go
 
@@ -50,5 +50,23 @@ func TestExampleStructTagsValueFailed(t *testing.T) {
 		Assert("json", "social_number")
 
 }
+
+```
+
+```bash
+ ~: go test
+
+--- FAIL: TestExampleStructTagsValueFailed (0.00s)
+	example_test.go:22: ExampleStruct.ID: Tag <json> does not have a value of <id>,but actual <rn>
+	example_test.go:23: ExampleStruct.ID: Tag <bson> not found
+	example_test.go:24: ExampleStruct.ID: Tag <json> does not have a value of <id>,but actual <rn>
+	example_test.go:26: ExampleStruct: Field <SN> not found
+	example_test.go:27: ExampleStruct.SN: Tag <xml> not found
+	example_test.go:28: ExampleStruct.SN: Tag <json> not found
+	example_test.go:30: ExampleStruct: Field <private> is private
+	example_test.go:31: ExampleStruct.private: Tag <xml> not found
+FAIL
+exit status 1
+FAIL	github.com/arteev/tag-assert/_example	0.001s
 
 ```
